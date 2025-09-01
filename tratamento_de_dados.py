@@ -2,20 +2,22 @@ import re
 from ScrapIPBOX_API import dados_ipbox
 '''Módulo que contém as funções para tratar os dados antes de serem inseridos dentro do banco de dados'''
 def limpar_intervalo(dados_ipbox):
-    '''o arquivo json faz a contagem do tempo das pausas e a quantidade das pausas entre parenteses
-    esse arquivo vai tratar esses dados'''
+    """
+    O arquivo JSON faz a contagem do tempo das pausas e a quantidade das pausas entre parênteses.
+    Esta função trata esses dados removendo a parte entre parênteses.
+    """
     campos_temporais = ['Banheiro', 'Descanso', 'Discando', 'Feedback', 'Lanche', 'Login', 'Pos Atendimento']
     try:
         for registro in dados_ipbox:
             # Acessa as pausas dentro de cada registro
             if 'pausas' in registro and registro['pausas']:
-                pausas_dict = registro['pausas'][0]  # Primeiro item da lista de pausas
+                pausas_dict = registro['pausas'][0]
 
                 for campo in campos_temporais:
                     if campo in pausas_dict:
-                        valor_original = pausas_dict[campo]
-                        # ✅ Aplica regex no VALOR, não no nome do campo
-                        valor_limpo = re.sub(r'\(.*?\)', '', str(valor_original)).strip()
+                        valor_original = str(pausas_dict[campo])
+                        #Trocando o regex(usado anteriormente) por split
+                        valor_limpo = valor_original.split("(")[0].strip()
                         pausas_dict[campo] = valor_limpo
                         print(f"Limpando {campo}: '{valor_original}' -> '{valor_limpo}'")
 
@@ -23,11 +25,10 @@ def limpar_intervalo(dados_ipbox):
     except Exception as e:
         print(f"Erro na limpeza: {e}")
         return dados_ipbox
-    except Exception as e:
-        print("Erro ao limpar intervalo", e)
 
     finally:
         print("Operação finalizada")
+
 
 
 
